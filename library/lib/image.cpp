@@ -99,7 +99,7 @@ void Image::layout(NVGcontext* vg, Style* style, FontStash* stash)
             this->imageY = (this->origViewHeight - this->imageHeight) / 2.0F;
             break;
         case ImageScaleType::FIT:
-            if (viewAspectRatio >= imageAspectRatio)
+            if (viewAspectRatio <= imageAspectRatio)
             {
                 this->imageHeight = this->getHeight();
                 this->imageWidth  = this->imageHeight * imageAspectRatio;

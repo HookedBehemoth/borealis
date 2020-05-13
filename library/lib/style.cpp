@@ -114,7 +114,7 @@ Style Style::horizon()
         .dialogFontSize       = 24,
         .hintFontSize         = 22,
 
-        .lineHeight             = 1.65f,
+        .lineHeight             = 1.5f,
         .notificationLineHeight = 1.35f
     };
 
@@ -248,10 +248,10 @@ Style Style::horizon()
 
     style.Dialog = {
         .width  = 770,
-        .height = 220,
+        .height = 280,
 
-        .paddingTopBottom = 65,
-        .paddingLeftRight = 115,
+        .paddingTopBottom = 60,
+        .paddingLeftRight = 65,
 
         .cornerRadius = 5.0f,
 
