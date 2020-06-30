@@ -73,7 +73,7 @@ brls::View* ExampleAdapter::createView()
     return new brls::SaneImage();
 }
 
-void ExampleAdapter::bindViewHolder(brls::View* view, int index)
+void ExampleAdapter::bindView(brls::View* view, int index)
 {
     auto img  = static_cast<brls::SaneImage*>(view);
     auto path = fmt::format("/home/behemoth/Pictures/{}", ImageList[index]);

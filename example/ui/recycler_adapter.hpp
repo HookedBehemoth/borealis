@@ -28,5 +28,5 @@ class RecyclerAdapter
 
     virtual size_t getItemCount()                 = 0;
     virtual brls::View* createView()              = 0;
-    virtual void bindViewHolder(brls::View*, int) = 0;
+    virtual void bindView(brls::View*, int) = 0;
 };

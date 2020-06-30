@@ -9,5 +9,5 @@ class ExampleAdapter : public RecyclerAdapter
 
     virtual size_t getItemCount() override final;
     virtual brls::View* createView() override final;
-    virtual void bindViewHolder(brls::View* view, int index) override final;
+    virtual void bindView(brls::View* view, int index) override final;
 };

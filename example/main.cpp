@@ -50,8 +50,28 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    brls::AppletFrame *albumFrame = new brls::AppletFrame(true, true);
+    {
+        albumFrame->setTitle("ShareNX \uE134");
+
+        auto adapter  = new ExampleAdapter();
+        auto recycler = new brls::RecyclerView();
+
+        auto view = recycler->get();
+        view->setAdapter(adapter);
+        view->setChildSize(1000, 120);
+        view->setMargins(26, 65, 23, 65);
+
+        //brls::Application::pushView(recycler);
+
+        albumFrame->setContentView(recycler);
+    }
+
+    // Add the root view to the stack
+    brls::Application::pushView(albumFrame);
+
     // Create a sample view
-    brls::TabFrame* rootFrame = new brls::TabFrame();
+    /*brls::TabFrame* rootFrame = new brls::TabFrame();
     rootFrame->setTitle("Borealis Example App");
     rootFrame->setIcon(BOREALIS_ASSET("icon/borealis.jpg"));
 
@@ -155,19 +175,23 @@ int main(int argc, char* argv[])
 
     testList->addView(layerSelectItem);
 
-    auto recyclerView = new brls::RecyclerView();
-    auto adapter = new ExampleAdapter();
-    recyclerView->get().setAdapter(adapter);
+    auto adapter  = new ExampleAdapter();
+    auto recycler = new brls::RecyclerView();
 
+    auto view = recycler->get();
+    view->setAdapter(adapter);
+    view->setChildSize(210, 120);
+    view->setMargins(10, 10, 10, 10);
+
+    rootFrame->addTab("recycler", recycler);
     rootFrame->addTab("First tab", testList);
-    rootFrame->addTab("recycler", recyclerView);
     rootFrame->addTab("Second tab", testLayers);
     rootFrame->addSeparator();
     rootFrame->addTab("Third tab", new brls::Rectangle(nvgRGB(255, 0, 0)));
     rootFrame->addTab("Fourth tab", new brls::Rectangle(nvgRGB(0, 255, 0)));
 
     // Add the root view to the stack
-    brls::Application::pushView(rootFrame);
+    brls::Application::pushView(rootFrame);*/
 
     // Run the app
     while (brls::Application::mainLoop())
