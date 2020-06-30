@@ -25,6 +25,8 @@
 
 #include "sample_installer_page.hpp"
 #include "sample_loading_page.hpp"
+#include "ui/example_adapter.hpp"
+#include "ui/recycler_view.hpp"
 
 std::vector<std::string> NOTIFICATIONS = {
     "You have cool hair",
@@ -153,7 +155,12 @@ int main(int argc, char* argv[])
 
     testList->addView(layerSelectItem);
 
+    auto recyclerView = new brls::RecyclerView();
+    auto adapter = new ExampleAdapter();
+    recyclerView->get().setAdapter(adapter);
+
     rootFrame->addTab("First tab", testList);
+    rootFrame->addTab("recycler", recyclerView);
     rootFrame->addTab("Second tab", testLayers);
     rootFrame->addSeparator();
     rootFrame->addTab("Third tab", new brls::Rectangle(nvgRGB(255, 0, 0)));

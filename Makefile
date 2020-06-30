@@ -39,7 +39,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	borealis_example
 BUILD		:=	build.nx
-SOURCES		:=	example
+SOURCES		:=	example example/ui
 DATA		:=	data
 ICON		:=	resources/icon/borealis.jpg
 INCLUDES	:=	example
@@ -67,7 +67,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-exceptions -std=c++1z -O2
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lnx -lm
+LIBS	:= -lnx -lm -lfmt
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
