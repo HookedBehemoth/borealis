@@ -8,7 +8,7 @@
 #include <switch.h>
 
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES /* Enforces GLSL std140/std430 alignment rules for glm types. */
-#define GLM_FORCE_INTRINSICS               // Enables usage of SIMD CPU instructions (requiring the above as well) */
+#define GLM_FORCE_INTRINSICS               /* Enables usage of SIMD CPU instructions (requiring the above as well). */
 #include <glm/vec2.hpp>
 
 namespace nvg {
@@ -27,12 +27,12 @@ namespace nvg {
         };
 
         void UpdateImage(dk::Image &image, CMemPool &scratchPool, dk::Device device, dk::Queue transferQueue, int type, int x, int y, int w, int h, const u8 *data) {
-            // Do not proceed if no data is provided upfront
+            /* Do not proceed if no data is provided upfront. */
             if (data == nullptr) {
                 return;
             }
 
-            // Allocate memory from the pool for the image
+            /* Allocate memory from the pool for the image. */
             const size_t imageSize = type == NVG_TEXTURE_RGBA ? w * h * 4 : w * h;
             CMemPool::Handle tempimgmem = scratchPool.allocate(imageSize, DK_IMAGE_LINEAR_STRIDE_ALIGNMENT);
             memcpy(tempimgmem.getCpuAddr(), data, imageSize);
@@ -47,7 +47,7 @@ namespace nvg {
             transferQueue.submitCommands(tempcmdbuf.finishList());
             transferQueue.waitIdle();
 
-            // Destroy temp mem
+            /* Destroy temp mem. */
             tempcmdmem.destroy();
             tempimgmem.destroy();
         }
@@ -203,19 +203,22 @@ namespace nvg {
         }
     }
 
-    CMemPool::Handle DkRenderer::CreateDataBuffer(const void *data, size_t size) {
-        auto buffer = m_data_mem_pool.allocate(size);
-        memcpy(buffer.getCpuAddr(), data, size);
-        return buffer;
-    }
-
     void DkRenderer::UpdateVertexBuffer(const void *data, size_t size) {
-        if (m_vertex_buffer) {
+        /* Destroy the existing vertex buffer if it is too small. */
+        if (m_vertex_buffer && m_vertex_buffer->getSize() < size) {
             m_vertex_buffer->destroy();
             m_vertex_buffer.reset();
         }
 
-        m_vertex_buffer = this->CreateDataBuffer(data, size);
+        /* Create a new buffer if needed. */
+        if (!m_vertex_buffer) {
+            m_vertex_buffer = m_data_mem_pool.allocate(size);
+        }
+
+        /* Copy data to the vertex buffer if it exists. */
+        if (m_vertex_buffer) {
+            memcpy(m_vertex_buffer->getCpuAddr(), data, size);
+        }
     }
 
     void DkRenderer::SetUniforms(const DKNVGcontext &ctx, int offset, int image) {
@@ -372,6 +375,7 @@ namespace nvg {
                 .setStencilFrontFailOp(DkStencilOp_Zero)
                 .setStencilFrontDepthFailOp(DkStencilOp_Zero)
                 .setStencilFrontPassOp(DkStencilOp_Zero);
+            m_dyn_cmd_buf.bindDepthStencilState(depth_stencil_state);
 
             /* Draw vertices. */
             for (int i = 0; i < npaths; i++) {
@@ -526,10 +530,9 @@ namespace nvg {
                 } else if (call.type == DKNVG_TRIANGLES) {
                     this->DrawTriangles(ctx, call);
                 }
-
-                m_queue.submitCommands(m_dyn_cmd_mem.end(m_dyn_cmd_buf));
-                m_queue.waitIdle();
             }
+
+            m_queue.submitCommands(m_dyn_cmd_mem.end(m_dyn_cmd_buf));
         }
 
         /* Reset calls. */

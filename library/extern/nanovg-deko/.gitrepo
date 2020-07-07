@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/Adubbz/nanovg-deko
 	branch = master
-	commit = 2458f7e32fed12d8793f23cc1bf8b752fca18d08
-	parent = eb3e4fe02014847a36357bee3718dfa177145695
+	commit = c197ba2f0d1fe2c70e2d49c61f16b4063aef569e
+	parent = bb5388fc058935cbc4105b498ecb3edf6ca4e0bd
 	method = merge
 	cmdver = 0.4.1
