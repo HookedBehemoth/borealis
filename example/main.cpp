@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
     testList->addView(testLabel);
 
     brls::ListItem* actionTestItem = new brls::ListItem("Custom Actions");
-    actionTestItem->registerAction("Show notification", brls::Key::L, [] {
+    actionTestItem->registerAction("Show notification", brls::KEY_L, [] {
         brls::Application::notify("Custom Action triggered");
         return true;
     });

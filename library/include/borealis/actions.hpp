@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <borealis/platform_drivers/platform_driver.hpp>
 #include <functional>
 #include <string>
 
@@ -30,25 +31,6 @@ namespace brls
 class View;
 
 typedef std::function<bool(void)> ActionListener;
-
-// ZL and ZR do not exist here because GLFW doesn't know them
-enum class Key
-{
-    A      = GLFW_GAMEPAD_BUTTON_A,
-    B      = GLFW_GAMEPAD_BUTTON_B,
-    X      = GLFW_GAMEPAD_BUTTON_X,
-    Y      = GLFW_GAMEPAD_BUTTON_Y,
-    LSTICK = GLFW_GAMEPAD_BUTTON_LEFT_THUMB,
-    RSTICK = GLFW_GAMEPAD_BUTTON_RIGHT_THUMB,
-    L      = GLFW_GAMEPAD_BUTTON_LEFT_BUMPER,
-    R      = GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER,
-    PLUS   = GLFW_GAMEPAD_BUTTON_START,
-    MINUS  = GLFW_GAMEPAD_BUTTON_BACK,
-    DLEFT  = GLFW_GAMEPAD_BUTTON_DPAD_LEFT,
-    DUP    = GLFW_GAMEPAD_BUTTON_DPAD_UP,
-    DRIGHT = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT,
-    DDOWN  = GLFW_GAMEPAD_BUTTON_DPAD_DOWN,
-};
 
 struct Action
 {

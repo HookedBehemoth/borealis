@@ -20,6 +20,7 @@
 
 #include <borealis/application.hpp>
 #include <borealis/box_layout.hpp>
+#include <borealis/platform_drivers/platform_driver.hpp>
 #include <borealis/rectangle.hpp>
 #include <borealis/sidebar.hpp>
 #include <borealis/tab_frame.hpp>
@@ -45,7 +46,7 @@ bool TabFrame::onCancel()
     // Go back to sidebar if not already focused
     if (!this->sidebar->isChildFocused())
     {
-        Application::onGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT, false);
+        Application::navigate(FocusDirection::LEFT);
         return true;
     }
 

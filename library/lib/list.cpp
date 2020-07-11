@@ -25,6 +25,7 @@
 #include <borealis/header.hpp>
 #include <borealis/list.hpp>
 #include <borealis/logger.hpp>
+#include <borealis/platform_drivers/platform_driver.hpp>
 #include <borealis/swkbd.hpp>
 #include <borealis/table.hpp>
 
@@ -122,7 +123,7 @@ ListItem::ListItem(std::string label, std::string description, std::string subLa
         this->descriptionView->setParent(this);
     }
 
-    this->registerAction("OK", Key::A, [this] { return this->onClick(); });
+    this->registerAction("OK", KEY_A, [this] { return this->onClick(); });
 }
 
 void ListItem::setThumbnail(Image* image)

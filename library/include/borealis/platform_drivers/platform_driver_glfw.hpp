@@ -33,20 +33,9 @@ namespace brls::drv
         virtual bool update();
         virtual void frame();
         virtual void swapBuffers();
-
-        virtual bool isAnyKeyDown() const;
-        virtual bool haveKeyStatesChanged() const;
-        virtual bool isKeyDown(const Key &key) const;
-        virtual bool isKeyUp(const Key &key) const;
-        virtual bool isKeyHeld(const Key &key) const;
- 
-        virtual std::pair<int, int> getTouchPosition() const;
-        virtual int getTouchCount() const;
  
     private:
         GLFWwindow *window = nullptr;
-
-        unsigned int gamepadDown = 0, gamepadDownOld = 0;
     };
 
 } // namespace brls::drv

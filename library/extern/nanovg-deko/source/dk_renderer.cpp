@@ -1,4 +1,4 @@
-#include "dk_renderer.hpp"
+#include <nanovg/dk_renderer.hpp>
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -158,6 +158,12 @@ namespace nvg {
         m_view_uniform_buffer.destroy();
         m_frag_uniform_buffer.destroy();
         m_textures.clear();
+    }
+
+    void DkRenderer::UpdateViewport(unsigned int view_width, unsigned int view_height)
+    {
+        m_view_width = view_width;
+        m_view_height = view_height;
     }
 
     int DkRenderer::AcquireImageDescriptor(std::shared_ptr<Texture> texture, int image) {
@@ -494,26 +500,32 @@ namespace nvg {
 
     void DkRenderer::Flush(DKNVGcontext &ctx) {
         if (ctx.ncalls > 0) {
+            puts("begin");
             /* Prepare dynamic command buffer. */
             m_dyn_cmd_mem.begin(m_dyn_cmd_buf);
 
+            puts("UpdateVertexBuffer");
             /* Update buffers with data. */
             this->UpdateVertexBuffer(ctx.verts, ctx.nverts * sizeof(NVGvertex));
 
+            puts("bindColorState");
             /* Enable blending. */
             m_dyn_cmd_buf.bindColorState(dk::ColorState{}.setBlendEnable(0, true));
 
+            puts("bindShaders");
             /* Setup. */
             m_dyn_cmd_buf.bindShaders(DkStageFlag_GraphicsMask, { m_vertex_shader, m_fragment_shader });
             m_dyn_cmd_buf.bindVtxAttribState(VertexAttribState);
             m_dyn_cmd_buf.bindVtxBufferState(VertexBufferState);
             m_dyn_cmd_buf.bindVtxBuffer(0, m_vertex_buffer->getGpuAddr(), m_vertex_buffer->getSize());
 
+            puts("pushConstants");
             /* Push the view size to the uniform buffer and bind it. */
             const auto view = View{glm::vec2{m_view_width, m_view_height}};
             m_dyn_cmd_buf.pushConstants(m_view_uniform_buffer.getGpuAddr(), m_view_uniform_buffer.getSize(), 0, sizeof(view), &view);
             m_dyn_cmd_buf.bindUniformBuffer(DkStage_Vertex, 0, m_view_uniform_buffer.getGpuAddr(), m_view_uniform_buffer.getSize());
 
+            printf("%d commands\n", ctx.ncalls);
             /* Iterate over calls. */
             for (int i = 0; i < ctx.ncalls; i++) {
                 const DKNVGcall &call = ctx.calls[i];
@@ -532,6 +544,7 @@ namespace nvg {
                 }
             }
 
+            puts("submitCommands");
             m_queue.submitCommands(m_dyn_cmd_mem.end(m_dyn_cmd_buf));
         }
 

@@ -18,63 +18,70 @@
 
 #pragma once
 
-#include <utility>
 #include <string>
+#include <utility>
 
 struct NVGcontext;
+
+namespace brls
+{
+
+enum Key
+{
+    KEY_A      = (1 << 0),
+    KEY_B      = (1 << 1),
+    KEY_X      = (1 << 2),
+    KEY_Y      = (1 << 3),
+    KEY_LSTICK = (1 << 4),
+    KEY_RSTICK = (1 << 5),
+    KEY_L      = (1 << 6),
+    KEY_R      = (1 << 7),
+    KEY_PLUS   = (1 << 8),
+    KEY_MINUS  = (1 << 9),
+    KEY_DLEFT  = (1 << 10),
+    KEY_DUP    = (1 << 11),
+    KEY_DRIGHT = (1 << 12),
+    KEY_DDOWN  = (1 << 13),
+};
+
+}
 
 namespace brls::drv
 {
 
-    enum class Key : unsigned short
+class PlatformDriver
+{
+  public:
+    virtual ~PlatformDriver() = default;
+
+    virtual bool initialize(const std::string& title, unsigned int windowWidth, unsigned int windowHeight) = 0;
+    virtual bool exit()                                                                                    = 0;
+
+    void quit();
+
+    virtual bool update()      = 0;
+    virtual void frame()       = 0;
+    virtual void swapBuffers() = 0;
+
+    bool isAnyKeyDown() const;
+    bool haveKeyStatesChanged() const;
+    unsigned long keysDown() const;
+    unsigned long keysUp() const;
+    unsigned long keysHeld() const;
+
+    std::pair<int, int> getTouchPosition() const;
+    int getTouchCount() const;
+
+    NVGcontext* getNVGContext()
     {
-        A      = (1 << 0),
-        B      = (1 << 1),
-        X      = (1 << 2),
-        Y      = (1 << 3),
-        LSTICK = (1 << 4),
-        RSTICK = (1 << 5),
-        L      = (1 << 6),
-        R      = (1 << 7),
-        PLUS   = (1 << 8),
-        MINUS  = (1 << 9),
-        DLEFT  = (1 << 10),
-        DUP    = (1 << 11),
-        DRIGHT = (1 << 12),
-        DDOWN  = (1 << 13),
-    };
+        return this->vg;
+    }
 
-    extern unsigned short operator|(const Key lhs, const Key rhs);
-    extern unsigned short operator&(const Key lhs, const Key rhs);
+  protected:
+    NVGcontext* vg;
+    bool quitFlag = false;
 
-    class PlatformDriver {
-    public:
-        virtual ~PlatformDriver() = default;
-
-        virtual bool initialize(const std::string &title, unsigned int windowWidth, unsigned int windowHeight) = 0;
-        virtual bool exit() = 0; 
-         
-        virtual bool update() = 0;
-        virtual void frame() = 0;
-        virtual void swapBuffers() = 0;
-
-        virtual bool isAnyKeyDown() const = 0;
-        virtual bool haveKeyStatesChanged() const = 0;
-        virtual bool isKeyDown(const Key &key) const = 0;
-        virtual bool isKeyUp(const Key &key) const = 0;
-        virtual bool isKeyHeld(const Key &key) const = 0;
- 
-        virtual std::pair<int, int> getTouchPosition() const = 0;
-        virtual int getTouchCount() const = 0;
- 
-        NVGcontext* getNVGContext();
-
-        unsigned int getWindowWidth();
-        unsigned int getWindowHeight();
-    protected:
-        NVGcontext* vg;
-
-        unsigned int windowWidth, windowHeight;
-    };
+    unsigned long gamepadDown = 0, gamepadDownOld = 0;
+};
 
 } // namespace brls::drv

@@ -69,7 +69,7 @@ Dropdown::Dropdown(std::string title, std::vector<std::string> values, ValueSele
     this->hint = new Hint();
     this->hint->setParent(this);
 
-    this->registerAction("Back", Key::B, [this] { return this->onCancel(); });
+    this->registerAction("Back", KEY_B, [this] { return this->onCancel(); });
 }
 
 void Dropdown::show(std::function<void(void)> cb, bool animate, ViewAnimation animation)

@@ -1,10 +1,11 @@
 mkfile_path	:=	$(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir	:=	$(BOREALIS_PATH)/$(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
-LIBS		:=	-lglfw3 -lEGL -lglapi -ldrm_nouveau -lm $(LIBS)
+LIBS		:=	-ldeko3dd -lnx -lm $(LIBS)
 
 SOURCES		:=	$(SOURCES) \
 				$(current_dir)/lib \
+				$(current_dir)/lib/platform_drivers \
 				$(current_dir)/extern/glad \
 				$(current_dir)/extern/nanovg-deko/source \
 				$(current_dir)/extern/nanovg-deko/source/framework \

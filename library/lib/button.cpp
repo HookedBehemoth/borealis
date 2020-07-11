@@ -21,6 +21,7 @@
 
 #include <borealis/application.hpp>
 #include <borealis/button.hpp>
+#include <borealis/platform_drivers/platform_driver.hpp>
 
 namespace brls
 {
@@ -28,7 +29,7 @@ namespace brls
 Button::Button(ButtonStyle style)
     : style(style)
 {
-    this->registerAction("OK", Key::A, [this] { return this->onClick(); });
+    this->registerAction("OK", KEY_A, [this] { return this->onClick(); });
 }
 
 LabelStyle Button::getLabelStyle()

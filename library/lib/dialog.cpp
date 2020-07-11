@@ -19,6 +19,7 @@
 #include <borealis/application.hpp>
 #include <borealis/button.hpp>
 #include <borealis/dialog.hpp>
+#include <borealis/platform_drivers/platform_driver.hpp>
 
 // TODO: different open animation?
 
@@ -31,7 +32,7 @@ Dialog::Dialog(View* contentView)
     if (contentView)
         contentView->setParent(this);
 
-    this->registerAction("Back", Key::B, [this] { return this->onCancel(); });
+    this->registerAction("Back", KEY_B, [this] { return this->onCancel(); });
 }
 
 Dialog::Dialog(std::string text)

@@ -18,21 +18,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 
 #include <algorithm>
 #include <borealis.hpp>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 
 #ifdef __SWITCH__
 
-#include <switch.h>
-
 #include <nanovg.h>
-#include <nanovg_dk.h>
+#include <switch.h>
 
 #endif
 
@@ -40,7 +39,11 @@
 #include <set>
 #include <thread>
 
+#ifdef __SWITCH__
+#include <borealis/platform_drivers/platform_driver_dk.hpp>
+#else
 #include <borealis/platform_drivers/platform_driver_glfw.hpp>
+#endif
 
 // Constants used for scaling as well as
 // creating a window of the right size on PC
@@ -50,9 +53,6 @@ constexpr uint32_t WINDOW_HEIGHT = 720;
 #define DEFAULT_FPS 60
 #define BUTTON_REPEAT_DELAY 15
 #define BUTTON_REPEAT_CADENCY 5
-
-// glfw code from the glfw hybrid app by fincs
-// https://github.com/fincs/hybrid_app
 
 namespace brls
 {
@@ -79,14 +79,15 @@ bool Application::init(std::string title, Style style, Theme theme)
     // Init theme to defaults
     Application::setTheme(theme);
 
-    #ifdef __SWITCH__
-
-    #else
-        Application::platformDriver = new drv::PlatformDriverGLFW();
-    #endif
+#ifdef __SWITCH__
+    Application::platformDriver = new drv::PlatformDriverDK();
+#else
+    Application::platformDriver = new drv::PlatformDriverGLFW();
+#endif
 
     Application::platformDriver->initialize(title, WINDOW_WIDTH, WINDOW_HEIGHT);
-    //windowFramebufferSizeCallback(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    Application::vg = Application::platformDriver->getNVGContext();
 
     // Load fonts
 #ifdef __SWITCH__
@@ -189,16 +190,10 @@ bool Application::mainLoop()
         frameStart = cpu_features_get_time_usec();
 
     if (!Application::platformDriver->update())
-        return false;
-
-    // libnx applet main loop
-#ifdef __SWITCH__
-    if (!appletMainLoop())
     {
         Application::exit();
         return false;
     }
-#endif
 
     // Trigger gamepad events
     // TODO: Translate axis events to dpad events here
@@ -208,18 +203,22 @@ bool Application::mainLoop()
     static retro_time_t buttonPressTime = 0;
     static int repeatingButtonTimer     = 0;
 
-    for (unsigned short key = 1; key > 0; key >>= 1) {
-        if (Application::platformDriver->isKeyHeld(static_cast<drv::Key>(key)))
-        {
-            anyButtonPressed = true;
-            repeating        = (repeatingButtonTimer > BUTTON_REPEAT_DELAY && repeatingButtonTimer % BUTTON_REPEAT_CADENCY == 0);
+    unsigned long kDown = Application::platformDriver->keysDown();
+    unsigned long kHeld = Application::platformDriver->keysHeld();
 
-            if (Application::platformDriver->isKeyDown(static_cast<drv::Key>(key)) || repeating)
-                Application::onGamepadButtonPressed(key, repeating);
-        }
+    if (kHeld)
+    {
+        anyButtonPressed = true;
+        repeating        = (repeatingButtonTimer > BUTTON_REPEAT_DELAY && repeatingButtonTimer % BUTTON_REPEAT_CADENCY == 0);
 
-        if (Application::platformDriver->haveKeyStatesChanged())
-            buttonPressTime = repeatingButtonTimer = 0;
+        if (kDown || repeating)
+            Application::onGamepadButtonPressed(kHeld, repeating);
+    }
+
+    if (Application::platformDriver->haveKeyStatesChanged())
+    {
+        buttonPressTime = repeatingButtonTimer = 0;
+        Logger::info("keys changed");
     }
 
     if (anyButtonPressed && cpu_features_get_time_usec() - buttonPressTime > 1000)
@@ -227,20 +226,6 @@ bool Application::mainLoop()
         buttonPressTime = cpu_features_get_time_usec();
         repeatingButtonTimer++; // Increased once every ~1ms
     }
-
-    // Handle window size changes
-    /*GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    unsigned newWidth  = viewport[2];
-    unsigned newHeight = viewport[3];*/
-
-    /*if (Application::windowWidth != newWidth || Application::windowHeight != newHeight)
-    {
-        Application::windowWidth  = newWidth;
-        Application::windowHeight = newHeight;
-        Application::onWindowSizeChanged();
-    }*/
 
     // Animations
     menu_animation_update();
@@ -270,7 +255,7 @@ bool Application::mainLoop()
 
 void Application::quit()
 {
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
+    Application::platformDriver->quit();
 }
 
 void Application::navigate(FocusDirection direction)
@@ -305,7 +290,7 @@ void Application::navigate(FocusDirection direction)
     Application::giveFocus(nextFocus);
 }
 
-void Application::onGamepadButtonPressed(char button, bool repeating)
+void Application::onGamepadButtonPressed(unsigned long button, bool repeating)
 {
     if (Application::blockInputsTokens != 0)
         return;
@@ -322,22 +307,21 @@ void Application::onGamepadButtonPressed(char button, bool repeating)
     // Navigation
     // Only navigate if the button hasn't been consumed by an action
     // (allows overriding DPAD buttons using actions)
-    switch (button)
+    if (button & KEY_DDOWN)
     {
-        case GLFW_GAMEPAD_BUTTON_DPAD_DOWN:
-            Application::navigate(FocusDirection::DOWN);
-            break;
-        case GLFW_GAMEPAD_BUTTON_DPAD_UP:
-            Application::navigate(FocusDirection::UP);
-            break;
-        case GLFW_GAMEPAD_BUTTON_DPAD_LEFT:
-            Application::navigate(FocusDirection::LEFT);
-            break;
-        case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT:
-            Application::navigate(FocusDirection::RIGHT);
-            break;
-        default:
-            break;
+        Application::navigate(FocusDirection::DOWN);
+    }
+    else if (button & KEY_DUP)
+    {
+        Application::navigate(FocusDirection::UP);
+    }
+    else if (button & KEY_DLEFT)
+    {
+        Application::navigate(FocusDirection::LEFT);
+    }
+    else if (button & KEY_DRIGHT)
+    {
+        Application::navigate(FocusDirection::RIGHT);
     }
 }
 
@@ -346,7 +330,7 @@ View* Application::getCurrentFocus()
     return Application::currentFocus;
 }
 
-bool Application::handleAction(char button)
+bool Application::handleAction(unsigned long button)
 {
     View* hintParent = Application::currentFocus;
     std::set<Key> consumedKeys;
@@ -355,7 +339,7 @@ bool Application::handleAction(char button)
     {
         for (auto& action : hintParent->getActions())
         {
-            if (action.key != static_cast<Key>(button))
+            if (!(action.key & button))
                 continue;
 
             if (consumedKeys.find(action.key) != consumedKeys.end())
@@ -382,10 +366,10 @@ void Application::frame()
     frameContext.fontStash  = &Application::fontStash;
     frameContext.theme      = Application::getThemeValues();
 
+    Application::platformDriver->frame();
+
     nvgBeginFrame(Application::vg, Application::windowWidth, Application::windowHeight, frameContext.pixelRatio);
     nvgScale(Application::vg, Application::windowScale, Application::windowScale);
-
-    Application::platformDriver->frame();
 
     std::vector<View*> viewsToDraw;
 
@@ -583,9 +567,9 @@ void Application::pushView(View* view, ViewAnimation animation)
     bool fadeOut = last && !last->isTranslucent() && !view->isTranslucent(); // play the fade out animation?
     bool wait    = animation == ViewAnimation::FADE; // wait for the old view animation to be done before showing the new one?
 
-    view->registerAction("Exit", Key::PLUS, [] { Application::quit(); return true; });
+    view->registerAction("Exit", KEY_PLUS, [] { Application::quit(); return true; });
     view->registerAction(
-        "FPS", Key::MINUS, [] { Application::toggleFramerateDisplay(); return true; }, true);
+        "FPS", KEY_MINUS, [] { Application::toggleFramerateDisplay(); return true; }, true);
 
     // Fade out animation
     if (fadeOut)
@@ -636,9 +620,19 @@ void Application::pushView(View* view, ViewAnimation animation)
     Application::viewStack.push_back(view);
 }
 
-void Application::onWindowSizeChanged()
+void Application::onWindowSizeChanged(unsigned width, unsigned height)
 {
-    Logger::debug("Layout triggered");
+    Logger::debug("Window size changed: %ux%u -> %ux%u", Application::windowWidth, Application::windowHeight, width, height);
+
+    Application::windowScale = (float)width / (float)WINDOW_WIDTH;
+
+    float contentHeight = ((float)height / (Application::windowScale * (float)WINDOW_HEIGHT)) * (float)WINDOW_HEIGHT;
+
+    Application::contentWidth  = WINDOW_WIDTH;
+    Application::contentHeight = (unsigned)roundf(contentHeight);
+
+    Application::windowWidth  = width;
+    Application::windowHeight = height;
 
     for (View* view : Application::viewStack)
     {

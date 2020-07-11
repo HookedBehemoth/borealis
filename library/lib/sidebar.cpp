@@ -19,6 +19,7 @@
 */
 
 #include <borealis/application.hpp>
+#include <borealis/platform_drivers/platform_driver.hpp>
 #include <borealis/sidebar.hpp>
 
 namespace brls
@@ -41,11 +42,11 @@ View* Sidebar::getDefaultFocus()
     if (this->lastFocus >= this->children.size())
         this->lastFocus = 0;
 
-    View* toFocus{ nullptr };
+    View* toFocus { nullptr };
     // Try to focus last focused one
-    if(this->children.size() != 0)
+    if (this->children.size() != 0)
         toFocus = this->children[this->lastFocus]->view->getDefaultFocus();
-    
+
     if (toFocus)
         return toFocus;
 
@@ -97,7 +98,7 @@ SidebarItem::SidebarItem(std::string label, Sidebar* sidebar)
     Style* style = Application::getStyle();
     this->setHeight(style->Sidebar.Item.height);
 
-    this->registerAction("OK", Key::A, [this] { return this->onClick(); });
+    this->registerAction("OK", KEY_A, [this] { return this->onClick(); });
 }
 
 void SidebarItem::draw(NVGcontext* vg, int x, int y, unsigned width, unsigned height, Style* style, FrameContext* ctx)

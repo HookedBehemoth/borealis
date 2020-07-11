@@ -41,6 +41,7 @@
 #include <borealis/logger.hpp>
 #include <borealis/material_icon.hpp>
 #include <borealis/notification_manager.hpp>
+#include <borealis/platform_drivers/platform_driver.hpp>
 #include <borealis/popup_frame.hpp>
 #include <borealis/progress_display.hpp>
 #include <borealis/progress_spinner.hpp>

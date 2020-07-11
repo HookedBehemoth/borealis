@@ -21,30 +21,45 @@
 
 namespace brls::drv
 {
-    unsigned short operator|(const Key lhs, const Key rhs)
-    {
-        return static_cast<unsigned short>(lhs) | static_cast<unsigned short>(rhs);
-    }
 
-    unsigned short operator&(const Key lhs, const Key rhs)
-    {
-        return static_cast<unsigned short>(lhs) & static_cast<unsigned short>(rhs);
-    }
+void PlatformDriver::quit()
+{
+    this->quitFlag = true;
+}
 
+bool PlatformDriver::isAnyKeyDown() const
+{
+    return this->gamepadDown > 0;
+}
 
-    NVGcontext* PlatformDriver::getNVGContext()
-    { 
-        return this->vg;
-    }
+bool PlatformDriver::haveKeyStatesChanged() const
+{
+    return this->gamepadDown != this->gamepadDownOld;
+}
 
-    unsigned int PlatformDriver::getWindowWidth()
-    { 
-        return this->windowWidth;
-    }
+unsigned long PlatformDriver::keysDown() const
+{
+    return (~this->gamepadDownOld) & this->gamepadDown;
+}
 
-    unsigned int PlatformDriver::getWindowHeight()
-    {
-        return this->windowHeight;
-    }
+unsigned long PlatformDriver::keysUp() const
+{
+    return this->gamepadDownOld & (~this->gamepadDown);
+}
+
+unsigned long PlatformDriver::keysHeld() const
+{
+    return this->gamepadDown;
+}
+
+std::pair<int, int> PlatformDriver::getTouchPosition() const
+{
+    return { 0, 0 };
+}
+
+int PlatformDriver::getTouchCount() const
+{
+    return 0;
+}
 
 } // namespace brls::drv

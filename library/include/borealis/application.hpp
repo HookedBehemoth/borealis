@@ -99,7 +99,7 @@ class Application
 
     static void notify(std::string text);
 
-    static void onGamepadButtonPressed(char button, bool repeating);
+    static void onGamepadButtonPressed(unsigned long button, bool repeating);
 
     /**
       * "Crashes" the app (displays a fullscreen CrashFrame)
@@ -131,10 +131,6 @@ class Application
 
     static void setMaximumFPS(unsigned fps);
 
-    // public so that the glfw callback can access it
-    inline static unsigned contentWidth, contentHeight;
-    inline static float windowScale;
-
     static void resizeFramerateCounter();
     static void resizeNotificationManager();
 
@@ -145,8 +141,11 @@ class Application
 
     static std::string getTitle();
 
+    static void onWindowSizeChanged(unsigned width, unsigned height);
+
+    static void navigate(FocusDirection direction);
+
   private:
-    inline static GLFWwindow* window;
     inline static NVGcontext* vg;
 
     inline static std::string title;
@@ -159,6 +158,8 @@ class Application
     inline static std::vector<View*> viewStack;
     inline static std::vector<View*> focusStack;
 
+    inline static float windowScale;
+    inline static unsigned contentWidth, contentHeight;
     inline static unsigned windowWidth, windowHeight;
 
     inline static View* currentFocus;
@@ -183,10 +184,6 @@ class Application
 
     inline static drv::PlatformDriver *platformDriver;
 
-    static void navigate(FocusDirection direction);
-
-    static void onWindowSizeChanged();
-
     static void frame();
     static void clear();
     static void exit();
@@ -196,7 +193,7 @@ class Application
      * the given button
      * Returns true if at least one action has been fired
      */
-    static bool handleAction(char button);
+    static bool handleAction(unsigned long button);
 };
 
 } // namespace brls

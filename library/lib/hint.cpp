@@ -21,6 +21,7 @@
 #include <borealis/application.hpp>
 #include <borealis/hint.hpp>
 #include <borealis/label.hpp>
+#include <borealis/platform_drivers/platform_driver.hpp>
 #include <set>
 
 namespace brls
@@ -54,15 +55,15 @@ bool actionsSortFunc(Action a, Action b)
     //  - finally B and A
 
     // + is before all others
-    if (a.key == Key::PLUS)
+    if (a.key == KEY_PLUS)
         return true;
 
     // A is after all others
-    if (b.key == Key::A)
+    if (b.key == KEY_A)
         return true;
 
     // B is after all others but A
-    if (b.key == Key::B && a.key != Key::A)
+    if (b.key == KEY_B && a.key != KEY_A)
         return true;
 
     // Keep original order for the rest
@@ -144,33 +145,33 @@ std::string Hint::getKeyIcon(Key key)
 {
     switch (key)
     {
-        case Key::A:
+        case KEY_A:
             return "\uE0E0";
-        case Key::B:
+        case KEY_B:
             return "\uE0E1";
-        case Key::X:
+        case KEY_X:
             return "\uE0E2";
-        case Key::Y:
+        case KEY_Y:
             return "\uE0E3";
-        case Key::LSTICK:
+        case KEY_LSTICK:
             return "\uE104";
-        case Key::RSTICK:
+        case KEY_RSTICK:
             return "\uE105";
-        case Key::L:
+        case KEY_L:
             return "\uE0E4";
-        case Key::R:
+        case KEY_R:
             return "\uE0E5";
-        case Key::PLUS:
+        case KEY_PLUS:
             return "\uE0EF";
-        case Key::MINUS:
+        case KEY_MINUS:
             return "\uE0F0";
-        case Key::DLEFT:
+        case KEY_DLEFT:
             return "\uE0ED";
-        case Key::DUP:
+        case KEY_DUP:
             return "\uE0EB";
-        case Key::DRIGHT:
+        case KEY_DRIGHT:
             return "\uE0EF";
-        case Key::DDOWN:
+        case KEY_DDOWN:
             return "\uE0EC";
         default:
             return "\uE152";
